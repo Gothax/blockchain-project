@@ -23,9 +23,13 @@ public class UtxoRepository {
         return utxoSet;
     }
 
+    public int getUtxoSetSize() {
+        return utxoSet.size();
+    }
+
     public static Utxo findUtxoByIdAndIndex(String id, String outputIndex) {
         return utxoSet.stream()
-                .filter(utxo -> utxo.getPtxHash().equals(id) && utxo.getOutputIndex().strip().equals(outputIndex))
+                .filter(utxo -> utxo.getPtxHash().strip().equals(id.strip()) && utxo.getOutputIndex().strip().equals(outputIndex.strip()))
                 .findFirst()
                 .orElse(null);
     }
