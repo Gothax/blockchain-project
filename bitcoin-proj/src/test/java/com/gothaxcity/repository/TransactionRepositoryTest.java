@@ -25,6 +25,7 @@ class TransactionRepositoryTest {
     void readFromTxt() throws IOException {
         // given
         List<String> strings = Files.readAllLines(Paths.get("src/main/resources/transactions.txt"));
+        System.out.println("strings.stream().toList().size() = " + strings.stream().toList().size());
         // when
         strings.forEach(System.out::println);
 
@@ -86,6 +87,7 @@ class TransactionRepositoryTest {
         TransactionRepository transactionRepository = new TransactionRepository();
         List<Transaction> transactions = transactionRepository.getTransactions();
         System.out.println("transactions = " + transactions);
+        System.out.println("transactions.getFirst().toHashTxt() = \n" + transactions.getFirst().toHashTxt());
         // when
         // then
         assertNotNull(transactions);
