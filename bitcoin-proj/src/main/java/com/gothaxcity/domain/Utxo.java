@@ -5,13 +5,13 @@ public class Utxo {
     private final String ptxHash;
     private final String outputIndex;
     private final String amount;
-    private final String script;
+    private final String lockingScript;
 
-    public Utxo(String ptxHash, String outputIndex, String amount, String script) {
+    public Utxo(String ptxHash, String outputIndex, String amount, String lockingScript) {
         this.ptxHash = ptxHash;
         this.outputIndex = outputIndex;
         this.amount = amount;
-        this.script = script;
+        this.lockingScript = lockingScript;
     }
 
     public String getPtxHash() {
@@ -26,8 +26,8 @@ public class Utxo {
         return amount;
     }
 
-    public String getScript() {
-        return script;
+    public String getLockingScript() {
+        return lockingScript;
     }
 
     @Override
@@ -36,15 +36,15 @@ public class Utxo {
                 "txHash='" + ptxHash + '\'' +
                 ", outputIndex=" + outputIndex +
                 ", value=" + amount +
-                ", script=" + script +
+                ", script=" + lockingScript +
                 '}';
     }
 
     public String toTxt() {
-        return "\n" + ptxHash + "," + outputIndex + "," + amount + "," + script;
+        return "\n" + ptxHash + "," + outputIndex + "," + amount + "," + lockingScript;
     }
 
     public String toPlainString() {
-        return ptxHash + "," + outputIndex + "," + amount + "," + script;
+        return ptxHash + "," + outputIndex + "," + amount + "," + lockingScript;
     }
 }
