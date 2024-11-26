@@ -1,5 +1,6 @@
 package com.gothaxcity.repository;
 
+import com.gothaxcity.domain.Transaction;
 import com.gothaxcity.domain.Utxo;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,8 +13,9 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class TransactionRepositoryTest {
-
-    private final TransactionRepository transactionRepository = new TransactionRepository();
+//
+//    private final UtxoRepository utxoRepository = new UtxoRepository();
+//    private final TransactionRepository transactionRepository = new TransactionRepository();
 
     TransactionRepositoryTest() throws IOException {
     }
@@ -25,6 +27,10 @@ class TransactionRepositoryTest {
         List<String> strings = Files.readAllLines(Paths.get("src/main/resources/transactions.txt"));
         // when
         strings.forEach(System.out::println);
+
+        for (String string : strings) {
+            System.out.println("string = " + string);
+        }
         // then
     }
 
@@ -33,7 +39,6 @@ class TransactionRepositoryTest {
     @DisplayName("txt 파일 읽고 객체로 반환-input은 not null, output은 생성")
     void makeEntity() throws IOException {
         // given
-        new UtxoRepository();
         List<String> strings = Files.readAllLines(Paths.get("src/main/resources/transactions.txt"));
         // when
         for (String string : strings) {
@@ -70,6 +75,23 @@ class TransactionRepositoryTest {
         }
         // then
     }
+
+    @Test
+    @DisplayName("트랜잭션 목록 가져오기")
+    void getTransactions() throws IOException {
+        // given
+
+        UtxoRepository utxoRepository = new UtxoRepository();
+
+        TransactionRepository transactionRepository = new TransactionRepository();
+        List<Transaction> transactions = transactionRepository.getTransactions();
+        System.out.println("transactions = " + transactions);
+        // when
+        // then
+        assertNotNull(transactions);
+
+    }
+
 
 
 

@@ -48,13 +48,16 @@ class UtxoRepositoryTest {
     @DisplayName("생성한 객체 utxo set 순서가 txt와 일치해야함")
     void orderOKTest() throws IOException {
         // given
-        UtxoRepository utxoRepository = new UtxoRepository();
         // when
+        System.out.println("utxoRepository.getUtxoSetSize() = " + utxoRepository.getUtxoSetSize());
         List<Utxo> utxoSet = utxoRepository.getUtxoSet();
+        System.out.println("utxoSet = " + utxoSet);
         // then
         int i = 1;
         for (Utxo utxo : utxoSet) {
             String id = utxo.getPtxHash();
+            System.out.println("id = " + id);
+            System.out.println("utxo = " + utxo);
             assertEquals(String.valueOf("tx"+i), id);
             i++;
         }
@@ -65,7 +68,7 @@ class UtxoRepositoryTest {
     void write2Txt() {
         // given
         Utxo newUtxo = new Utxo("tx4", "output1", "output2", "output3");
-        utxoRepository.addUtxo(newUtxo);
+        UtxoRepository.addUtxo(newUtxo);
         // when
 
         // then
@@ -76,7 +79,7 @@ class UtxoRepositoryTest {
     void deleteAtTxt() {
         utxoRepository.getUtxoSet().forEach(System.out::println);
         // given
-        Utxo delTx = utxoRepository.findUtxoByIdAndIndex("tx4", "0");
+        Utxo delTx = UtxoRepository.findUtxoByIdAndIndex("tx4", "0");
         // when
         utxoRepository.removeUtxo(delTx);
         utxoRepository.getUtxoSet().forEach(System.out::println);
