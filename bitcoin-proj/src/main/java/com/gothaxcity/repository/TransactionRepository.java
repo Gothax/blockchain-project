@@ -27,16 +27,18 @@ public class TransactionRepository {
         List<String> strings = Files.readAllLines(PATH);
         Utxo input = null;
         List<Utxo> output = new ArrayList<>();
+        String unlockingScript = null;
 
         for (String string : strings) {
             if (string.startsWith("input")) {
                 input = getInput(string);
+                unlockingScript = string.split(",")[4];
             }
             if (string.startsWith("output")) {
                 getOutput(string, output);
             }
             if (string.isEmpty()) {
-                Transaction transaction = new Transaction(input, output);
+                Transaction transaction = new Transaction(input, output, unlockingScript);
                 transactions.add(transaction);
                 input = null;
                 output = new ArrayList<>();
