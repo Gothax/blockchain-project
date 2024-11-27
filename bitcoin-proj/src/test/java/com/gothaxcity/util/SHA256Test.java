@@ -3,15 +3,15 @@ package com.gothaxcity.util;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-class FunctionTest {
+class SHA256Test {
     
     @Test
     @DisplayName("hash 함수 test")
-    void testHash(){
+    void testHashWithSHA256(){
         // given
         // when
 
-        byte[] hashedHello = Function.hash("hello");
+        String hashedHello = SHA256.encrypt("hello");
         // then
         System.out.println("hashedHello = " + hashedHello);
     }
