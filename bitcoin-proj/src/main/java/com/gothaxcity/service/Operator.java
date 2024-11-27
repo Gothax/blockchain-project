@@ -81,20 +81,40 @@ public class Operator {
     }
 
     private boolean checkMultiSignature() {
+        List<String> pubKeys = popAndGetN();
+        List<String> sigs = popAndGetN();
+
+        int validSignatures = getValidSignatures(sigs, pubKeys);
+
+        return validSignatures == sigs.size();
+    }
+
+    private int getValidSignatures(List<String> sigs, List<String> pubKeys) {
+        int validSignatures = 0;
+        for (String sig : sigs) {
+            boolean isValid = false;
+            for (String pubKey : pubKeys) {
+                if (ECDSA.verifySigWithPubKey(message, sig, pubKey)) {
+                    isValid = true;
+                    break; // 서명이 유효하면 다른 키로는 검증 안함
+                }
+            }
+            if (isValid) {
+                validSignatures++;
+                continue;
+            }
+            return 0; // 하나라도 유효하지 않은 서명이 있으면 전체 검증 실패
+        }
+        return validSignatures;
+    }
+
+    private List<String> popAndGetN() {
         int n = (int) stack.pop();
-        List<String> pubKeys = new ArrayList<>();
+        List<String> keys = new ArrayList<>();
         for (int i = 0; i < n; i++) {
-            pubKeys.add((String) stack.pop());
+            keys.add((String) stack.pop());
         }
-        int m = (int) stack.pop();
-        List<String> sigs = new ArrayList<>();
-        for (int i = 0; i < m; i++) {
-            sigs.add((String) stack.pop());
-        }
-
-
-
-        return true;
+        return keys;
     }
 
     private boolean checkSignature() {
