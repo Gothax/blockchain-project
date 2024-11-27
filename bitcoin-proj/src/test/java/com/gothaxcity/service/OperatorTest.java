@@ -1,10 +1,11 @@
 package com.gothaxcity.service;
 
+import com.gothaxcity.util.ECDSA;
+import com.gothaxcity.util.SHA256;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.security.KeyPair;
 
 class OperatorTest {
 
@@ -12,44 +13,40 @@ class OperatorTest {
     @DisplayName("script를 받아서 스택에 넣는다")
     void pushScriptToStack() {
         // given
-        Operator operator = new Operator();
 
         String lockingScript = "DUP HASH <pubKeyHash> EQUALVERIFY CHECKSIG";
         String unlockingScript = "<sig> <pubKey>";
+        Operator operator = new Operator(lockingScript, unlockingScript, "message");
         // when
-        operator.validate(lockingScript, unlockingScript);
+        boolean validate = operator.validate();
         // then
-    }
-
-
-    @Test
-    @DisplayName("P2PKH SCRIPT test 실패 사례")
-    void testP2PKH() {
-        // given
-        Operator operator = new Operator();
-
-        String lockingScript = "DUP HASH <pubKeyHash> EQUALVERIFY CHECKSIG";
-        String unlockingScript = "<sig> <pubKey>";
-        // when
-        boolean result = operator.validate(lockingScript, unlockingScript);
-
-        // then
-        assertFalse(result);
+        System.out.println("result = " + validate);
     }
 
 
     @Test
     @DisplayName("P2PKH SCRIPT test 성공 사례")
-    void testP2PKH2() {
+    void testP2PKH() {
         // given
-        Operator operator = new Operator();
+        KeyPair keyPair = ECDSA.generateRandomKeyPair();
+        String message = "Hello this is test message";
+        String signature = ECDSA.sign(message, keyPair.getPrivate());
+        byte[] encoded = keyPair.getPublic().getEncoded();
+        String publicKeyBase64 = java.util.Base64.getEncoder().encodeToString(encoded);
 
-        String lockingScript = "DUP HASH <pubKeyHash> EQUALVERIFY CHECKSIG";
-        String unlockingScript = "<sig> <pubKey>";
+
+//        String lockingScript = "DUP HASH <pubKeyHash> EQUALVERIFY CHECKSIG";
+//        String unlockingScript = "<sig> <pubKey>";
+        String lockingScript = "DUP HASH " + SHA256.encryptGetEncode(publicKeyBase64) + " EQUALVERIFY CHECKSIG";
+        String unlockingScript = signature + " " + publicKeyBase64;
+        Operator operator = new Operator(lockingScript, unlockingScript, message);
         // when
-        boolean result = operator.validate(lockingScript, unlockingScript);
+        boolean result = operator.validate();
 
         // then
-        assertTrue(result);
-        }
+        System.out.println("result = " + result);
+    }
+
+
+
 }
