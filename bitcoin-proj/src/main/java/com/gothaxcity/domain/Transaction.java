@@ -41,7 +41,7 @@ public class Transaction {
     private String outputToTxt() {
         StringBuilder sb = new StringBuilder();
         for (Utxo utxo : output) {
-            sb.append("output: ").append(utxo.toPlainString()).append("\n");
+            sb.append("output: ").append(utxo.toHashTxt()).append("\n");
         }
         return sb.toString();
     }

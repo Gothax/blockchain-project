@@ -47,4 +47,8 @@ public class Utxo {
     public String toPlainString() {
         return ptxHash + "," + outputIndex + "," + amount + "," + lockingScript;
     }
+
+    public String toHashTxt() {
+        return outputIndex + ", " + amount + ", " + lockingScript;
+    }
 }
