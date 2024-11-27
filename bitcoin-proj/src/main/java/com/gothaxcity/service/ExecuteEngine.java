@@ -28,11 +28,12 @@ public class ExecuteEngine {
 
     private boolean validate(Transaction transaction) {
         // 검증마다 새로운 stack 할당하기 위해 Operator 객체 생성
-        Operator operator = new Operator();
         String lockingScript = transaction.getInput().getLockingScript();
         String unlockingScript = transaction.getUnlockingScript();
+        String message = transaction.toHashTxt();
+        Operator operator = new Operator(lockingScript, unlockingScript, message);
 
-        return operator.validate(lockingScript, unlockingScript);
+        return operator.validate();
     }
 
 
