@@ -116,7 +116,6 @@ class OperatorTest {
         // "<sig1> <sig2> ..."
         String unlockingScript = String.join(" ", signatures);
 
-        // Operator 생성
         Operator operator = new Operator(lockingScript, unlockingScript, message);
 
         // when
@@ -127,6 +126,35 @@ class OperatorTest {
         assertTrue(result);
     }
 
+
+    @Test
+    @DisplayName("P2SH SCRIPT test 간단한 성공 사례")
+    void testP2SH() {
+        // given
+        String message = "P2SH test message";
+
+        // Inner script (subScriptX): 실행될 스크립트
+        String subScriptX = "5 5 OP_EQUAL OP_CHECKFINALRESULT";
+
+        // SubScriptX 해시값
+        String scriptXHash = SHA256.encryptGetEncode(subScriptX);
+
+        // Locking Script: DUP HASH <scriptXHash> EQUALVERIFY
+        String lockingScript = "OP_DUP OP_HASH " + scriptXHash + " OP_EQUALVERIFY";
+
+        // Unlocking Script: <scriptX>
+        String unlockingScript = subScriptX;
+
+        // Operator 생성
+        Operator operator = new Operator(lockingScript, unlockingScript, message);
+
+        // when
+        boolean result = operator.validate();
+
+        // then
+        System.out.println("result = " + result);
+        assertTrue(result);
+    }
 
 
 
