@@ -20,11 +20,27 @@ public class Operator {
         this.message = message;
     }
 
-    public boolean validate() {
+    public boolean validate(){
 
-        String entireScript = unlockingScript + " " + lockingScript;
+        // P2SH 방식인 경우 locking script에 OP_CHECKFINALRESULT가 없음
+        // 이때 unlocking script가 실행할 script 자체
+        // unlocking이 split되지 hash 되어야 하고, true인 경우 split된 script가 모두 실행되어야 함
+        if (!lockingScript.contains("OP_CHECKFINALRESULT")) {
+            stack.push(unlockingScript);
+            boolean subResult = start(lockingScript);
+            if (!subResult) {
+                return false;
+            }
+            stack.clear();
+            return start(unlockingScript);
+        }
+        // P2PKH, MULTISIGNATURE 방식인 경우
+        return start(unlockingScript + " " + lockingScript);
+    }
+
+    private boolean start(String entireScript) {
+
         boolean skip = false;
-
         try {
             for (String script : entireScript.split(" ")) {
                 if (script.equals("OP_CHECKFINALRESULT")) {
@@ -51,7 +67,9 @@ public class Operator {
         } catch (IllegalArgumentException e) {
             return false;
         }
-        return false;
+        // P2SH script hash 검증이 성공 (OP_CHECKFINALRESULT로 분기하지 않는 경우는 이것밖에 없음)
+        // P2SH script hash가 달랐다면 예외 발생
+        return true;
     }
 
     // OP 명령어중 하나면 실행, 아니면 스택에 push
