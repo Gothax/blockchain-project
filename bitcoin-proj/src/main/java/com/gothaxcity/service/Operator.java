@@ -7,8 +7,6 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.util.Arrays.stream;
-
 public class Operator {
 
     private final ArrayDeque<Object> stack = new ArrayDeque<>();
@@ -24,61 +22,85 @@ public class Operator {
 
     public boolean validate() {
 
-        // unlockingScript를 stack에 넣는다
-        stream(unlockingScript.split(" "))
-                .toList()
-                .forEach(stack::push);
-        System.out.println("stack = " + stack);
+        String entireScript = unlockingScript + " " + lockingScript;
+        boolean skip = false;
 
-        // lockingScript를 실행
         try {
-            stream(lockingScript.split(" ")).forEach(this::execute);
+            for (String script : entireScript.split(" ")) {
+                if (script.equals("OP_CHECKFINALRESULT")) {
+                    return stack.pop().equals(true) && stack.isEmpty();
+                }
+                if (script.equals("OP_IF")) {
+                    boolean condition = Boolean.parseBoolean((String) stack.pop());
+                    skip = !condition;
+                    continue;
+                }
+                if (script.equals("OP_ELSE")) {
+                    skip = !skip;
+                    continue;
+                }
+                if (script.equals("OP_ENDIF")) {
+                    skip = false;
+                    continue;
+                }
+                if (!skip) {
+                    execute(script);
+                    System.out.println("실행 후 stack " + stack + " script = " + script);
+                }
+            }
         } catch (IllegalArgumentException e) {
             return false;
         }
-
-        return stack.pop().equals(true) && stack.isEmpty();
+        return false;
     }
 
+    // OP 명령어중 하나면 실행, 아니면 스택에 push
     private void execute(String s) {
-        System.out.println("stack = " + stack + "script = " + s);
-        if (s.equals("DUP")) {
+        System.out.println("실행 전: stack = " + stack + " script = " + s);
+        if (s.equals("OP_DUP")) {
             stack.push(stack.peek());
             return;
         }
-        if (s.equals("HASH")) {
+        if (s.equals("OP_HASH")) {
             hash();
             return;
         }
-        if (s.equals("EQUAL")) {
+        if (s.equals("OP_EQUAL")) {
             stack.push(equals());
             return;
         }
-        if (s.equals("EQUALVERIFY")) {
+        if (s.equals("OP_EQUALVERIFY")) {
             if (!equals()) {
                 throw new IllegalArgumentException("검증 실패");
             }
             return;
         }
-        if (s.equals("CHECKSIG")) {
+        if (s.equals("OP_CHECKSIG")) {
             boolean result = checkSignature();
             stack.push(result);
             return;
         }
-        if (s.equals("CHECKSIGVERIFY")) {
+        if (s.equals("OP_CHECKSIGVERIFY")) {
             if (!checkSignature()) {
                 throw new IllegalArgumentException("검증 실패");
             }
             return;
         }
-        if (s.equals("CHECKMULTISIG")) {
+        if (s.equals("OP_CHECKMULTISIG")) {
             boolean result = checkMultiSignature();
             stack.push(result);
+            return;
+        }
+        if (s.equals("OP_CHECKMULTISIGVERIFY")) {
+            if (!checkMultiSignature()) {
+                throw new IllegalArgumentException("검증 실패");
+            }
             return;
         }
 
         stack.push(s);
     }
+
 
     private boolean checkMultiSignature() {
         List<String> pubKeys = popAndGetN();
@@ -109,7 +131,7 @@ public class Operator {
     }
 
     private List<String> popAndGetN() {
-        int n = (int) stack.pop();
+        int n = Integer.parseInt(stack.pop().toString());
         List<String> keys = new ArrayList<>();
         for (int i = 0; i < n; i++) {
             keys.add((String) stack.pop());

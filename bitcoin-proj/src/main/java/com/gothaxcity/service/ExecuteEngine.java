@@ -8,8 +8,6 @@ import com.gothaxcity.repository.UtxoRepository;
 import java.io.IOException;
 import java.util.List;
 
-import static java.lang.Integer.parseInt;
-
 public class ExecuteEngine {
 
     private final UtxoRepository utxoRepository = new UtxoRepository();
@@ -36,10 +34,13 @@ public class ExecuteEngine {
     private boolean validateAmount(Transaction transaction) {
         String inputAmount = transaction.getInput().getAmount();
         List<Utxo> output = transaction.getOutput();
-        String outputAmount = output.stream()
-                .map(Utxo::getAmount)
-                .reduce("0", (a, b) -> String.valueOf(parseInt(a) + parseInt(b)));
-        return parseInt(inputAmount) >= parseInt(outputAmount);
+
+        double inputAmountDouble = Double.parseDouble(inputAmount);
+        double outputAmount = output.stream()
+                .mapToDouble(amount -> Double.parseDouble(amount.getAmount()))
+                .sum();
+
+        return inputAmountDouble >= outputAmount;
     }
 
     private boolean validateScript(Transaction transaction) {
