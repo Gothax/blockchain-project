@@ -22,9 +22,7 @@ public class Operator {
 
     public boolean validate(){
 
-        // P2SH 방식인 경우 locking script에 OP_CHECKFINALRESULT가 없음
-        // 이때 unlocking script가 실행할 script 자체
-        // unlocking이 split되지 hash 되어야 하고, true인 경우 split된 script가 모두 실행되어야 함
+        // P2SH 방식인 경우 locking script에 OP_CHECKFINALRESULT 없음
         if (!lockingScript.contains("OP_CHECKFINALRESULT")) {
             stack.push(unlockingScript);
             boolean subResult = start(lockingScript);
