@@ -1,0 +1,31 @@
+tx:
+input: tx1, 0, 100, OP_DUP OP_HASH <public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_CHECKFINALRESULT, <signature> <public key>
+output, 0: 50, OP_DUP OP_HASH <seller's public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_CHECKFINALRESULT
+output, 1: 40, OP_DUP OP_HASH <buyer's public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_CHECKFINALRESULT
+
+
+tx:
+input: tx2, 0, 100, 2 <pubKey1> <pubKey2> <pubKey3> 3 OP_CHECKMULTISIG OP_CHECKFINALRESULT, <signature1> <signature2>
+output, 0: 30, OP_DUP OP_HASH <seller's public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_CHECKFINALRESULT
+output, 1: 60, OP_DUP OP_HASH <buyer's public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_CHECKFINALRESULT
+
+
+tx:
+input: tx3, 0, 100, OP_DUP OP_HASH <script X hash> OP_EQUALVERIFY, <script X>
+output, 0: 50, OP_DUP OP_HASH <seller's public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_CHECKFINALRESULT
+output, 1: 40, OP_DUP OP_HASH <buyer's public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_CHECKFINALRESULT
+
+script X = <Alice signature> <Alice public key> 1 OP_IF OP_DUP OP_HASH <public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_ELSE 2 <Alice pubKey> <Bob pubKey> <pubKey3> 3 OP_CHECKMULTISIG OP_ENDIF OP_CHECKFINALRESULT
+
+
+
+tx:
+input: tx3, 0, 100, OP_DUP OP_HASH <script X hash> OP_EQUALVERIFY, <script X>
+output, 0: 50, OP_DUP OP_HASH <seller's public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_CHECKFINALRESULT
+output, 1: 10, OP_DUP OP_HASH <Alice public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_CHECKFINALRESULT
+output, 2: 30, OP_DUP OP_HASH <Bob public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_CHECKFINALRESULT
+
+script X = <Alice signature> <Bob signature> 0 OP_IF OP_DUP OP_HASH <public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_ELSE 2 <Alice pubKey> <Bob pubKey> <pubKey3> 3 OP_CHECKMULTISIG OP_ENDIF OP_CHECKFINALRESULT
+
+
+
