@@ -57,7 +57,7 @@ class OperatorTest {
     @DisplayName("IF ELSE ENDIF 흐름 테스트")
     void ifEndifTest() {
         // given
-        String unlockingScript = "true";
+        String unlockingScript = "1";
         String lockingScript = "OP_IF 5 OP_ELSE 10 OP_ENDIF OP_CHECKFINALRESULT";
         // when
         Operator operator = new Operator(lockingScript, unlockingScript, "message");
@@ -157,6 +157,195 @@ class OperatorTest {
     }
 
 
+    @Test
+    @DisplayName("tx1 적절한 sig, key 생성")
+    void makeTxExample1() {
+        // given
+
+//        tx:
+//        input: tx1, 0, 100, OP_DUP OP_HASH <public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_CHECKFINALRESULT, <signature> <public key>
+//        output, 0: 50, OP_DUP OP_HASH <seller's public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_CHECKFINALRESULT
+//        output, 1: 40, OP_DUP OP_HASH <buyer's public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_CHECKFINALRESULT
+
+        KeyPair keyPair = ECDSA.generateRandomKeyPair();
+        String message = "tx1";
+        String signature = ECDSA.sign(message, keyPair.getPrivate());
+        byte[] encoded = keyPair.getPublic().getEncoded();
+        String pubKey = java.util.Base64.getEncoder().encodeToString(encoded);
+        String hashedPubKey = SHA256.encryptGetEncode(pubKey);
+
+        System.out.println("========넣어줘야 하는 값 시작, previous tx id hash가 tx1이라고 가정========");
+        System.out.println("<public key> = " + pubKey);
+        System.out.println("<public key hash> = " + hashedPubKey);
+        System.out.println("<signature> = " + signature);
+        System.out.println("========넣어줘야 하는 값 끝========");
+        String lockingScript = "OP_DUP OP_HASH " + SHA256.encryptGetEncode(pubKey) + " OP_EQUALVERIFY OP_CHECKSIG OP_CHECKFINALRESULT";
+        String unlockingScript = signature + " " + pubKey;
+        Operator operator = new Operator(lockingScript, unlockingScript, message);
+        // when
+        boolean result = operator.validate();
+
+        // then
+        System.out.println("result = " + result);
+        assertTrue(result);
+    }
+
+    @Test
+    @DisplayName("tx2 적절한 sig, key 생성")
+    void makeTx2Example() {
+        // given
+//        tx:
+//        input: tx2, 0, 100, 2 <pubKey1> <pubKey2> <pubKey3> 3 OP_CHECKMULTISIG OP_CHECKFINALRESULT, <signature1> <signature2>
+//        output, 0: 30, OP_DUP OP_HASH <seller's public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_CHECKFINALRESULT
+//        output, 1: 60, OP_DUP OP_HASH <buyer's public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_CHECKFINALRESULT
+
+        // when
+        KeyPair keyPair = ECDSA.generateRandomKeyPair();
+        String message = "tx2";
+        String signature1 = ECDSA.sign(message, keyPair.getPrivate());
+        byte[] encoded = keyPair.getPublic().getEncoded();
+        String pubKey1 = java.util.Base64.getEncoder().encodeToString(encoded);
+
+        KeyPair keyPair2 = ECDSA.generateRandomKeyPair();
+        String signature2 = ECDSA.sign(message, keyPair2.getPrivate());
+        byte[] encoded2 = keyPair2.getPublic().getEncoded();
+        String pubKey2 = java.util.Base64.getEncoder().encodeToString(encoded2);
+
+        KeyPair keyPair3 = ECDSA.generateRandomKeyPair();
+        byte[] encoded3 = keyPair3.getPublic().getEncoded();
+        String pubKey3 = java.util.Base64.getEncoder().encodeToString(encoded3);
+
+        System.out.println("========넣어줘야 하는 값 시작, previous tx id hash가 tx2이라고 가정========");
+        System.out.println("<pubKey1> = " + pubKey1);
+        System.out.println("<pubKey2> = " + pubKey2);
+        System.out.println("<pubKey3> = " + pubKey3);
+
+        System.out.println("<signature1> = " + signature1);
+        System.out.println("<signature2> = " + signature2);
+        System.out.println("========넣어줘야 하는 값 끝========");
+
+        // then
+        String lockingScript = "2 " + pubKey1 + " " + pubKey2 + " " + pubKey3 + " 3 OP_CHECKMULTISIG OP_CHECKFINALRESULT";
+        String unlockingScript = signature1 + " " + signature2;
+        Operator operator = new Operator(lockingScript, unlockingScript, message);
+        boolean result = operator.validate();
+
+        System.out.println("result = " + result);
+        assertTrue(result);
+    }
+
+    @Test
+    @DisplayName("tx3 적절한 sig, key 생성")
+    void makeTx3Example() {
+        // given
+//        tx:
+//        input: tx3, 0, 100, OP_DUP OP_HASH <script X hash> OP_EQUALVERIFY, <script X>
+//        output, 0: 50, OP_DUP OP_HASH <seller's public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_CHECKFINALRESULT
+//        output, 1: 40, OP_DUP OP_HASH <buyer's public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_CHECKFINALRESULT
+//
+//        script X = <Alice signature> <Alice public key> 1 OP_IF OP_DUP OP_HASH <public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_ELSE 2 <Alice pubKey> <Bob pubKey> <pubKey3> 3 OP_CHECKMULTISIG OP_ENDIF OP_CHECKFINALRESULT
+//  alice sig, pubkey, bob pubkey, pubkey3 (pubkey 3개, valid한 서명 1개), scriptX hash(unlocking script)
+        // when
+        KeyPair keyPair = ECDSA.generateRandomKeyPair();
+        String message = "tx3";
+        String aliceSig = ECDSA.sign(message, keyPair.getPrivate());
+        byte[] encoded = keyPair.getPublic().getEncoded();
+        String alicePubKey = java.util.Base64.getEncoder().encodeToString(encoded);
+        String aliceHashedPubKey = SHA256.encryptGetEncode(alicePubKey);
+
+        KeyPair keyPair2 = ECDSA.generateRandomKeyPair();
+        byte[] encoded2 = keyPair2.getPublic().getEncoded();
+        String bobPubKey = java.util.Base64.getEncoder().encodeToString(encoded2);
+
+        KeyPair keyPair3 = ECDSA.generateRandomKeyPair();
+        byte[] encoded3 = keyPair3.getPublic().getEncoded();
+        String pubKey3 = java.util.Base64.getEncoder().encodeToString(encoded3);
+
+//        String scriptXHash = SHA256.encryptGetEncode(aliceSig + " " + alicePubKey + " 1 OP_IF OP_DUP OP_HASH " + aliceHashedPubKey + " OP_EQUALVERIFY OP_CHECKSIG OP_ELSE 2 " + alicePubKey + " " + bobPubKey + " " + pubKey3 + " 3 OP_CHECKMULTISIG OP_ENDIF OP_CHECKFINALRESULT");
+
+
+
+        // then
+        String unlockingScript = aliceSig + " " + alicePubKey + " 1 OP_IF OP_DUP OP_HASH " + aliceHashedPubKey + " OP_EQUALVERIFY OP_CHECKSIG OP_ELSE 2 " + alicePubKey + " " + bobPubKey + " " + pubKey3 + " 3 OP_CHECKMULTISIG OP_ENDIF OP_CHECKFINALRESULT";
+        String scriptXHash = SHA256.encryptGetEncode(unlockingScript);
+        String lockingScript = "OP_DUP OP_HASH " + scriptXHash + " OP_EQUALVERIFY";
+        Operator operator = new Operator(lockingScript, unlockingScript, message);
+        boolean result = operator.validate();
+
+
+
+        System.out.println("========넣어줘야 하는 값 시작, previous tx id hash가 tx3이라고 가정========");
+        System.out.println("<Alice public key> = " + alicePubKey);
+        System.out.println("<Alice public key hash> = " + aliceHashedPubKey);
+        System.out.println("<Alice signature> = " + aliceSig);
+        System.out.println("<Bob public key> = " + bobPubKey);
+        System.out.println("<pubKey3> = " + pubKey3);
+        System.out.println("scriptXHash = " + scriptXHash);
+        System.out.println("unlockingScript = " + unlockingScript);
+        System.out.println("lockingScript = " + lockingScript);
+        System.out.println("========넣어줘야 하는 값 끝========");
+
+
+        System.out.println("result = " + result);
+        assertTrue(result);
+    }
+
+    @Test
+    @DisplayName("tx4 적절한 sig, key 생성")
+    void makeTx4Example() {
+        // given
+//        tx:
+//        input: tx3, 0, 100, OP_DUP OP_HASH <script X hash> OP_EQUALVERIFY, <script X>
+//        output, 0: 50, OP_DUP OP_HASH <seller's public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_CHECKFINALRESULT
+//        output, 1: 10, OP_DUP OP_HASH <Alice public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_CHECKFINALRESULT
+//        output, 2: 30, OP_DUP OP_HASH <Bob public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_CHECKFINALRESULT
+//
+//        script X = <Alice signature> <Bob signature> 0 OP_IF OP_DUP OP_HASH <public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_ELSE 2 <Alice pubKey> <Bob pubKey> <pubKey3> 3 OP_CHECKMULTISIG OP_ENDIF OP_CHECKFINALRESULT
+        // alic sig, bob sig, alice pubkey, bob pubkey, pubkey3 (pubkey 3개, valid한 서명 2개)
+        // when
+
+        KeyPair keyPair = ECDSA.generateRandomKeyPair();
+        String message = "tx4";
+        String aliceSig = ECDSA.sign(message, keyPair.getPrivate());
+        byte[] encoded = keyPair.getPublic().getEncoded();
+        String alicePubKey = java.util.Base64.getEncoder().encodeToString(encoded);
+        String aliceHashedPubKey = SHA256.encryptGetEncode(alicePubKey);
+
+        KeyPair keyPair2 = ECDSA.generateRandomKeyPair();
+        String bobSig = ECDSA.sign(message, keyPair2.getPrivate());
+        byte[] encoded2 = keyPair2.getPublic().getEncoded();
+        String bobPubKey = java.util.Base64.getEncoder().encodeToString(encoded2);
+
+        KeyPair keyPair3 = ECDSA.generateRandomKeyPair();
+        byte[] encoded3 = keyPair3.getPublic().getEncoded();
+        String pubKey3 = java.util.Base64.getEncoder().encodeToString(encoded3);
+
+
+
+        // then
+        String unlockingScript = aliceSig + " " + bobSig + " 0 OP_IF OP_DUP OP_HASH " + aliceHashedPubKey + " OP_EQUALVERIFY OP_CHECKSIG OP_ELSE 2 " + alicePubKey + " " + bobPubKey + " " + pubKey3 + " 3 OP_CHECKMULTISIG OP_ENDIF OP_CHECKFINALRESULT";
+        String scriptXHash = SHA256.encryptGetEncode(unlockingScript);
+        String lockingScript = "OP_DUP OP_HASH " + scriptXHash + " OP_EQUALVERIFY";
+
+
+        System.out.println("========넣어줘야 하는 값 시작, previous tx id hash가 tx3이라고 가정========");
+        System.out.println("<Alice public key> = " + alicePubKey);
+        System.out.println("<Alice public key hash> = " + aliceHashedPubKey);
+        System.out.println("<Alice signature> = " + aliceSig);
+        System.out.println("<Bob public key> = " + bobPubKey);
+        System.out.println("<Bob signature> = " + bobSig);
+        System.out.println("<pubKey3> = " + pubKey3);
+        System.out.println("scriptXHash = " + scriptXHash);
+        System.out.println("unlockingScript = " + unlockingScript);
+        System.out.println("lockingScript = " + lockingScript);
+        System.out.println("========넣어줘야 하는 값 끝========");
+
+        Operator operator = new Operator(lockingScript, unlockingScript, message);
+        boolean result = operator.validate();
+
+        System.out.println("result = " + result);
+        assertTrue(result);
+    }
 
 
 }
