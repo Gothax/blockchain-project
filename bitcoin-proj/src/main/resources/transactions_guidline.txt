@@ -1,0 +1,87 @@
+
+====================================================================================================
+P2PKH
+tx:
+input: tx1, 0, 100, OP_DUP OP_HASH <public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_CHECKFINALRESULT, <signature> <public key>
+output, 0: 50, OP_DUP OP_HASH <seller's public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_CHECKFINALRESULT
+output, 1: 40, OP_DUP OP_HASH <buyer's public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_CHECKFINALRESULT
+
+util 패키지의 ECDSA 메서드로 key pair 생성 -> <public key>에 넣어줌
+key pair private key로 signature 생성 -> <signature>에 넣어줌
+pub key hash 생성 -> <public key hash>에 넣어줌
+
+전체 스크립트
+<signature> <public key> OP_DUP OP_HASH <public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_CHECKFINALRESULT
+
+====================================================================================================
+
+
+====================================================================================================
+MULTISIG
+tx:
+input: tx2, 0, 100, 2 <pubKey1> <pubKey2> <pubKey3> 3 OP_CHECKMULTISIG OP_CHECKFINALRESULT, <signature1> <signature2>
+output, 0: 50, OP_DUP OP_HASH <seller's public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_CHECKFINALRESULT
+output, 1: 40, OP_DUP OP_HASH <buyer's public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_CHECKFINALRESULT
+
+util 패키지의 ECDSA 메서드로 key pair 생성 -> <pubKey1>, <pubKey2>, <pubKey3>에 넣어줌
+key pair private key로 signature 생성 -> <signature1>, <signature2>에 넣어줌
+
+전체 스크립트
+<signature1> <signature2> 2 <pubKey1> <pubKey2> <pubKey3> 3 OP_CHECKMULTISIG OP_CHECKFINALRESULT
+====================================================================================================
+
+
+
+====================================================================================================
+p2sh script를 작성 - 요구사항
+P2SH 형태에서는 <scriptX>에 해당하는 스크립트로 4절의 IF ... ELSE ... ENDIF 및 IF ... ENDIF 명령어와
+CHECKSIG(VERIFY), CHECKMULTISIG(VERIFY) 명령어가 적절히 조합되도록
+(예: IF ... ELSE ... ENDIF에서 IF 실행 부분에 CHECKSIG(VERIFY)가 들어가고 ELSE 실행 부분에 CHECKMULTISIG(VERIFY)가 들어감) 한다.
+ 이와 같은 트랜잭션이 spend하려는 UTXO도 트랜잭션의 unlocking script에 매치되는 올바른 locking script를 포함하도록 UTXOes.txt에 포함시킨다.
+
+
+locking script
+OP_DUP OP_HASH <script X hash> OP_EQUALVERIFY
+
+scriptX 예시
+OP_IF
+    OP_DUP OP_HASH <public key hash> OP_EQUALVERIFY OP_CHECKSIG
+OP_ELSE
+    2 <Alice pubKey> <Bob pubKey> <pubKey3> 3 OP_CHECKMULTISIG
+OP_ENDIF
+OP_CHECKFINALRESULT
+
+script x 한줄로
+OP_IF OP_DUP OP_HASH <public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_ELSE 2 <Alice pubKey> <Bob pubKey> <pubKey3> 3 OP_CHECKMULTISIG OP_ENDIF OP_CHECKFINALRESULT
+
+이때 unlocking script
+1.
+<Alice signature> <Alice public key> 1
+2.
+<Alice signature> <Bob signature> 0
+
+
+이러면 그냥 unlocking script로
+<Alice signature> <Alice public key> 1 OP_IF OP_DUP OP_HASH <public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_ELSE 2 <Alice pubKey> <Bob pubKey> <pubKey3> 3 OP_CHECKMULTISIG OP_ENDIF OP_CHECKFINALRESULT
+<Alice signature> <Bob signature> 0 OP_IF OP_DUP OP_HASH <public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_ELSE 2 <Alice pubKey> <Bob pubKey> <pubKey3> 3 OP_CHECKMULTISIG OP_ENDIF OP_CHECKFINALRESULT
+이 두가지
+====================================================================================================
+P2SH (alice만 검증하는 경우)
+tx:
+input: tx3, 0, 100, OP_DUP OP_HASH <script X hash> OP_EQUALVERIFY, <script X>
+output, 0: 50, OP_DUP OP_HASH <seller's public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_CHECKFINALRESULT
+output, 1: 40, OP_DUP OP_HASH <buyer's public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_CHECKFINALRESULT
+
+script X = <Alice signature> <Alice public key> 1 OP_IF OP_DUP OP_HASH <public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_ELSE 2 <Alice pubKey> <Bob pubKey> <pubKey3> 3 OP_CHECKMULTISIG OP_ENDIF OP_CHECKFINALRESULT
+====================================================================================================
+
+====================================================================================================
+P2SH (alice, bob 둘다 검증하는 경우)
+tx:
+input: tx3, 0, 100, OP_DUP OP_HASH <script X hash> OP_EQUALVERIFY, <script X>
+output, 0: 50, OP_DUP OP_HASH <seller's public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_CHECKFINALRESULT
+output, 1: 10, OP_DUP OP_HASH <Alice public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_CHECKFINALRESULT
+output, 2: 30, OP_DUP OP_HASH <Bob public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_CHECKFINALRESULT
+
+script X = <Alice signature> <Bob signature> 0 OP_IF OP_DUP OP_HASH <public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_ELSE 2 <Alice pubKey> <Bob pubKey> <pubKey3> 3 OP_CHECKMULTISIG OP_ENDIF OP_CHECKFINALRESULT
+====================================================================================================
