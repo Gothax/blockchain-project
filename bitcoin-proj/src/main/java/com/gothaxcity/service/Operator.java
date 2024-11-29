@@ -45,8 +45,12 @@ public class Operator {
                     return stack.pop().equals(true) && stack.isEmpty();
                 }
                 if (script.equals("OP_IF")) {
-                    boolean condition = Boolean.parseBoolean((String) stack.pop());
-                    skip = !condition;
+                    Object popped = stack.pop();
+                    if (popped.equals("true") | popped.equals("1")) {
+                        skip = false;
+                        continue;
+                    }
+                    skip = true;
                     continue;
                 }
                 if (script.equals("OP_ELSE")) {
@@ -59,7 +63,7 @@ public class Operator {
                 }
                 if (!skip) {
                     execute(script);
-                    System.out.println("실행 후 stack " + stack + " script = " + script);
+                    System.out.println("현 script = " + script + " 실행 후 stack " + stack);
                 }
             }
         } catch (IllegalArgumentException e) {
@@ -72,7 +76,7 @@ public class Operator {
 
     // OP 명령어중 하나면 실행, 아니면 스택에 push
     private void execute(String s) {
-        System.out.println("실행 전: stack = " + stack + " script = " + s);
+        System.out.println("현 script = " + s + " 실행 전 stack " + stack);
         if (s.equals("OP_DUP")) {
             stack.push(stack.peek());
             return;
