@@ -47,8 +47,8 @@ public class ExecuteEngine {
         // 검증마다 새로운 stack 할당하기 위해 Operator 객체 생성
         String lockingScript = transaction.getInput().getLockingScript();
         String unlockingScript = transaction.getUnlockingScript();
-        String message = transaction.toHashTxt();
-        Operator operator = new Operator(lockingScript, unlockingScript, message);
+        String prevTxHash = transaction.getInput().getPtxHash();
+        Operator operator = new Operator(lockingScript, unlockingScript, prevTxHash);
 
         return operator.validate();
     }
