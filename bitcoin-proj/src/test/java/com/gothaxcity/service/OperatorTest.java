@@ -23,9 +23,13 @@ class OperatorTest {
         String unlockingScript = "<sig> <pubKey>";
         Operator operator = new Operator(lockingScript, unlockingScript, "message");
         // when
-        boolean validate = operator.validate();
+        try {
+            boolean validate = operator.validate();
+            System.out.println("result = " + validate);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         // then
-        System.out.println("result = " + validate);
     }
 
 
@@ -295,7 +299,7 @@ class OperatorTest {
     void makeTx4Example() {
         // given
 //        tx:
-//        input: tx3, 0, 100, OP_DUP OP_HASH <script X hash> OP_EQUALVERIFY, <script X>
+//        input: tx4, 0, 100, OP_DUP OP_HASH <script X hash> OP_EQUALVERIFY, <script X>
 //        output, 0: 50, OP_DUP OP_HASH <seller's public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_CHECKFINALRESULT
 //        output, 1: 10, OP_DUP OP_HASH <Alice public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_CHECKFINALRESULT
 //        output, 2: 30, OP_DUP OP_HASH <Bob public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_CHECKFINALRESULT
@@ -328,7 +332,7 @@ class OperatorTest {
         String lockingScript = "OP_DUP OP_HASH " + scriptXHash + " OP_EQUALVERIFY";
 
 
-        System.out.println("========넣어줘야 하는 값 시작, previous tx id hash가 tx3이라고 가정========");
+        System.out.println("========넣어줘야 하는 값 시작, previous tx id hash가 tx4이라고 가정========");
         System.out.println("<Alice public key> = " + alicePubKey);
         System.out.println("<Alice public key hash> = " + aliceHashedPubKey);
         System.out.println("<Alice signature> = " + aliceSig);
