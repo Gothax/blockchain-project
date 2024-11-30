@@ -68,8 +68,10 @@ public class Transaction {
 
         // 검증 실패 시만 "failed at" 추가
         if (!result && failedAt != null && !failedAt.isEmpty()) {
-            sb.append("\n        failed at: ").append(failedAt).append("\n");
+            sb.append("\n        failed at: ").append(failedAt);
         }
+
+        sb.append("\n");
         return sb.toString();
     }
 

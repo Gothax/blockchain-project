@@ -2,12 +2,16 @@ package com.gothaxcity.service;
 
 import com.gothaxcity.util.ECDSA;
 import com.gothaxcity.util.SHA256;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Operator {
+
+    private static final Logger logger = LoggerFactory.getLogger(Operator.class);
 
     private final ArrayDeque<Object> stack;
     private final String lockingScript;
@@ -63,7 +67,7 @@ public class Operator {
             }
             if (!skip) {
                 execute(script);
-                System.out.println("현 script = " + script + " 실행 후 stack " + stack);
+                logger.debug("현 script = {} 실행 후 stack {}", script, stack);
             }
         }
         // P2SH script hash 검증이 성공 (OP_CHECKFINALRESULT로 분기하지 않는 경우는 이것밖에 없음)
@@ -73,7 +77,7 @@ public class Operator {
 
     // OP 명령어중 하나면 실행, 아니면 스택에 push
     private void execute(String s) {
-        System.out.println("현 script = " + s + " 실행 전 stack " + stack);
+        logger.debug("현 script = {} 실행 전 stack {}", s, stack);
         if (s.equals("OP_DUP")) {
             stack.push(stack.peek());
             return;
