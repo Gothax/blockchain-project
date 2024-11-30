@@ -14,8 +14,16 @@ public class TransactionRepository {
 
     private static final Path PATH = Paths.get("src/main/resources/transactions.txt");
     private final List<Transaction> transactions = new ArrayList<>();
+    private static TransactionRepository transactionRepository;
 
-    public TransactionRepository() throws IOException {
+    public static TransactionRepository getInstance() throws IOException {
+        if (transactionRepository == null) {
+            transactionRepository = new TransactionRepository();
+        }
+        return transactionRepository;
+    }
+
+    private TransactionRepository() throws IOException {
         loadTransactionSet();
     }
 

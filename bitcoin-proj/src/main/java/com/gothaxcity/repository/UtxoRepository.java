@@ -14,8 +14,16 @@ import static java.nio.file.StandardOpenOption.*;
 public class UtxoRepository {
     private static final Path PATH = Paths.get("src/main/resources/UTXOes.txt");
     private static final List<Utxo> utxoSet = new ArrayList<>();
+    private static UtxoRepository utxoRepository;
 
-    public UtxoRepository() throws IOException {
+    public static UtxoRepository getInstance() throws IOException {
+        if (utxoRepository == null) {
+            utxoRepository = new UtxoRepository();
+        }
+        return utxoRepository;
+    }
+
+    private UtxoRepository() throws IOException {
         loadUtxoSet();
     }
 
