@@ -39,12 +39,12 @@ public class UtxoRepository {
         addToTxt(utxo);
     }
 
-    public void removeUtxo(Utxo utxo) {
+    public static void removeUtxo(Utxo utxo) {
         utxoSet.remove(utxo);
         removeTxt(utxo);
     }
 
-    private void removeTxt(Utxo utxo) {
+    private static void removeTxt(Utxo utxo) {
         try {
             List<String> strings = Files.readAllLines(PATH);
             List<String> collected = strings.stream()
@@ -58,7 +58,7 @@ public class UtxoRepository {
 
     private static void addToTxt(Utxo utxo) {
         try {
-            Files.write(PATH, utxo.toTxt().getBytes(), APPEND);
+            Files.write(PATH, utxo.toTxtAdd().getBytes(), APPEND);
         } catch (IOException e) {
             e.printStackTrace();
         }

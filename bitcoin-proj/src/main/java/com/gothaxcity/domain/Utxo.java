@@ -2,7 +2,7 @@ package com.gothaxcity.domain;
 
 public class Utxo {
 
-    private final String ptxHash;
+    private String ptxHash;
     private final String outputIndex;
     private final String amount;
     private final String lockingScript;
@@ -13,6 +13,11 @@ public class Utxo {
         this.amount = amount;
         this.lockingScript = lockingScript;
     }
+
+    public void addPtxHash(String ptxHash) {
+        this.ptxHash = ptxHash;
+    }
+
 
     public String getPtxHash() {
         return ptxHash;
@@ -50,5 +55,9 @@ public class Utxo {
 
     public String toHashTxt() {
         return outputIndex + ", " + amount + ", " + lockingScript;
+    }
+
+    public String toTxtAdd() {
+        return "\n" + ptxHash + ", " + outputIndex + ", " + amount + ", " + lockingScript;
     }
 }

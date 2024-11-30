@@ -4,6 +4,7 @@ import com.gothaxcity.domain.Transaction;
 import com.gothaxcity.domain.Utxo;
 import com.gothaxcity.repository.TransactionRepository;
 import com.gothaxcity.repository.UtxoRepository;
+import com.gothaxcity.util.SHA256;
 
 import java.io.IOException;
 import java.util.List;
@@ -29,9 +30,21 @@ public class ExecuteEngine {
                 e.printStackTrace();
             }
             System.out.println(transaction.toStringWithValidity(result, error));
-//            if (result) {
-//                modifyUtxo();
-//            }
+            if (result) {
+                modifyUtxo(transaction);
+            }
+        }
+    }
+
+    private void modifyUtxo(Transaction transaction) {
+        Utxo input = transaction.getInput();
+        UtxoRepository.removeUtxo(input);
+
+        List<Utxo> output = transaction.getOutput();
+        for (Utxo newUtxo : output) {
+            String txIdHash = SHA256.encryptGetEncode(transaction.toHashTxt());
+            newUtxo.addPtxHash(txIdHash);
+            UtxoRepository.addUtxo(newUtxo);
         }
     }
 
