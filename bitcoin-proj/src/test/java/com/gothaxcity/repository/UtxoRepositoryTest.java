@@ -12,7 +12,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class UtxoRepositoryTest {
-    private final UtxoRepository utxoRepository = new UtxoRepository();
+    private final UtxoRepository utxoRepository = UtxoRepository.getInstance();
 
     UtxoRepositoryTest() throws IOException {
     }

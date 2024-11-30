@@ -14,8 +14,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class TransactionRepositoryTest {
 //
-    private final UtxoRepository utxoRepository = new UtxoRepository();
-    private final TransactionRepository transactionRepository = new TransactionRepository();
+    private final UtxoRepository utxoRepository = UtxoRepository.getInstance();
+    private final TransactionRepository transactionRepository = TransactionRepository.getInstance();
 
     TransactionRepositoryTest() throws IOException {
     }

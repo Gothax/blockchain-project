@@ -76,4 +76,9 @@ public class Transaction {
     }
 
 
+    public String toSnapshotTxt(boolean result) {
+        String valid = result ? "passed" : "failed";
+        return "transaction: " + SHA256.encryptGetEncode(this.toHashTxt()) +
+                ", validity check:" + valid;
+    }
 }
