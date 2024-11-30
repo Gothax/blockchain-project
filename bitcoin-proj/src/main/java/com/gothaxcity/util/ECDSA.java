@@ -18,6 +18,8 @@ public class ECDSA {
             signature.initVerify(pubKey);
             signature.update(messageHash);
             return signature.verify(sigBytes);
+        } catch (SignatureException e) {
+            throw new IllegalArgumentException("Signature 검증 실패");
         } catch (Exception e) {
             e.printStackTrace();
             return false;

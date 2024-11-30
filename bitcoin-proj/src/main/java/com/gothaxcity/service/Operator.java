@@ -9,15 +9,16 @@ import java.util.List;
 
 public class Operator {
 
-    private final ArrayDeque<Object> stack = new ArrayDeque<>();
+    private final ArrayDeque<Object> stack;
     private final String lockingScript;
     private final String unlockingScript;
     private final String message;
 
     public Operator(String lockingScript, String unlockingScript, String message) {
-        this.lockingScript = lockingScript;
-        this.unlockingScript = unlockingScript;
-        this.message = message;
+        this.lockingScript = lockingScript.strip();
+        this.unlockingScript = unlockingScript.strip();
+        this.message = message.strip();
+        stack = new ArrayDeque<>();
     }
 
     public boolean validate(){
@@ -39,35 +40,31 @@ public class Operator {
     private boolean start(String entireScript) {
 
         boolean skip = false;
-        try {
-            for (String script : entireScript.split(" ")) {
-                if (script.equals("OP_CHECKFINALRESULT")) {
-                    return stack.pop().equals(true) && stack.isEmpty();
-                }
-                if (script.equals("OP_IF")) {
-                    Object popped = stack.pop();
-                    if (popped.equals("true") | popped.equals("1")) {
-                        skip = false;
-                        continue;
-                    }
-                    skip = true;
-                    continue;
-                }
-                if (script.equals("OP_ELSE")) {
-                    skip = !skip;
-                    continue;
-                }
-                if (script.equals("OP_ENDIF")) {
+        for (String script : entireScript.split(" ")) {
+            if (script.equals("OP_CHECKFINALRESULT")) {
+                return stack.pop().equals(true) && stack.isEmpty();
+            }
+            if (script.equals("OP_IF")) {
+                Object popped = stack.pop();
+                if (popped.equals("true") | popped.equals("1")) {
                     skip = false;
                     continue;
                 }
-                if (!skip) {
-                    execute(script);
-                    System.out.println("현 script = " + script + " 실행 후 stack " + stack);
-                }
+                skip = true;
+                continue;
             }
-        } catch (IllegalArgumentException e) {
-            return false;
+            if (script.equals("OP_ELSE")) {
+                skip = !skip;
+                continue;
+            }
+            if (script.equals("OP_ENDIF")) {
+                skip = false;
+                continue;
+            }
+            if (!skip) {
+                execute(script);
+                System.out.println("현 script = " + script + " 실행 후 stack " + stack);
+            }
         }
         // P2SH script hash 검증이 성공 (OP_CHECKFINALRESULT로 분기하지 않는 경우는 이것밖에 없음)
         // P2SH script hash가 달랐다면 예외 발생
@@ -91,7 +88,7 @@ public class Operator {
         }
         if (s.equals("OP_EQUALVERIFY")) {
             if (!equals()) {
-                throw new IllegalArgumentException("검증 실패");
+                throw new IllegalArgumentException("OP_EQUALVERIFY 검증 실패");
             }
             return;
         }
@@ -102,7 +99,7 @@ public class Operator {
         }
         if (s.equals("OP_CHECKSIGVERIFY")) {
             if (!checkSignature()) {
-                throw new IllegalArgumentException("검증 실패");
+                throw new IllegalArgumentException("OP_CHECKSIGVERIFY 검증 실패");
             }
             return;
         }
@@ -113,7 +110,7 @@ public class Operator {
         }
         if (s.equals("OP_CHECKMULTISIGVERIFY")) {
             if (!checkMultiSignature()) {
-                throw new IllegalArgumentException("검증 실패");
+                throw new IllegalArgumentException("OP_CHECKMULTISIGVERIFY 검증 실패");
             }
             return;
         }

@@ -19,8 +19,16 @@ public class ExecuteEngine {
     public void validateTxs() {
         List<Transaction> transactions = transactionRepository.getTransactions();
         for (Transaction transaction : transactions) {
-            boolean result = validate(transaction);
-//            print(result);
+            String error = "";
+            boolean result = true;
+            try {
+                result = validate(transaction);
+            } catch (Exception e) {
+                result = false;
+                error = e.getMessage();
+                e.printStackTrace();
+            }
+            System.out.println(transaction.toStringWithValidity(result, error));
 //            if (result) {
 //                modifyUtxo();
 //            }
