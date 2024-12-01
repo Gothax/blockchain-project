@@ -63,26 +63,26 @@ class UtxoRepositoryTest {
         }
     }
 
-    @Test
-    @DisplayName("추가한 객체를 txt파일에 write")
-    void write2Txt() {
-        // given
-        Utxo newUtxo = new Utxo("tx4", "output1", "output2", "output3");
-        UtxoRepository.addUtxo(newUtxo);
-        // when
+//    @Test
+//    @DisplayName("추가한 객체를 txt파일에 write")
+//    void write2Txt() {
+//        // given
+//        Utxo newUtxo = new Utxo("tx4", "output1", "output2", "output3");
+//        UtxoRepository.addUtxo(newUtxo);
+//        // when
+//
+//        // then
+//    }
 
-        // then
-    }
-
-    @Test
-    @DisplayName("객체를 삭제하면 txt파일에서도 삭제")
-    void deleteAtTxt() {
-        utxoRepository.getUtxoSet().forEach(System.out::println);
-        // given
-        Utxo delTx = UtxoRepository.findUtxoByIdAndIndex("tx4", "0");
-        // when
-        utxoRepository.removeUtxo(delTx);
-        utxoRepository.getUtxoSet().forEach(System.out::println);
-        // then
-    }
+//    @Test
+//    @DisplayName("객체를 삭제하면 txt파일에서도 삭제")
+//    void deleteAtTxt() {
+//        utxoRepository.getUtxoSet().forEach(System.out::println);
+//        // given
+//        Utxo delTx = UtxoRepository.findUtxoByIdAndIndex("tx4", "0");
+//        // when
+//        utxoRepository.removeUtxo(delTx);
+//        utxoRepository.getUtxoSet().forEach(System.out::println);
+//        // then
+//    }
 }

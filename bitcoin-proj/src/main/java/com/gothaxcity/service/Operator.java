@@ -29,7 +29,8 @@ public class Operator {
 
         // P2SH 방식인 경우 locking script에 OP_CHECKFINALRESULT 없음
         if (!lockingScript.contains("OP_CHECKFINALRESULT")) {
-            stack.push(unlockingScript);
+            String scriptX = getScriptXFromUnlockingScript();
+            stack.push(scriptX);
             boolean subResult = start(lockingScript);
             if (!subResult) {
                 return false;
@@ -173,5 +174,13 @@ public class Operator {
     private void hash() {
         String pop = (String) stack.pop();
         stack.push(SHA256.encryptGetEncode(pop));
+    }
+
+    private String getScriptXFromUnlockingScript() {
+        int i = unlockingScript.indexOf("OP_IF");
+        if (i == -1) {
+            return unlockingScript;
+        }
+        return unlockingScript.substring(i);
     }
 }

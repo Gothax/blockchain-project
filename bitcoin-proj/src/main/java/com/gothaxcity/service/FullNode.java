@@ -27,8 +27,8 @@ public class FullNode implements Runnable {
     public void validateTxs() throws InterruptedException {
         List<Transaction> transactions = transactionRepository.getTransactions();
         for (Transaction transaction : transactions) {
+            lock.lock();
             try {
-                lock.lock();
                 // 시각적으로 잘 보기 위해 오래 걸린다고 가정
                 Thread.sleep(6000);
                 processValidate(transaction);

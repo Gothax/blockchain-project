@@ -270,8 +270,10 @@ class OperatorTest {
 
 
         // then
-        String unlockingScript = aliceSig + " " + alicePubKey + " 1 OP_IF OP_DUP OP_HASH " + aliceHashedPubKey + " OP_EQUALVERIFY OP_CHECKSIG OP_ELSE 2 " + alicePubKey + " " + bobPubKey + " " + pubKey3 + " 3 OP_CHECKMULTISIG OP_ENDIF OP_CHECKFINALRESULT";
-        String scriptXHash = SHA256.encryptGetEncode(unlockingScript);
+        String scriptX = "OP_IF OP_DUP OP_HASH " + aliceHashedPubKey + " OP_EQUALVERIFY OP_CHECKSIG OP_ELSE 2 " + alicePubKey + " " + bobPubKey + " " + pubKey3 + " 3 OP_CHECKMULTISIG OP_ENDIF OP_CHECKFINALRESULT";
+        String unlockingScript = aliceSig + " " + alicePubKey + " 1 " + scriptX;
+//        String unlockingScript = aliceSig + " " + alicePubKey + " 1 OP_IF OP_DUP OP_HASH " + aliceHashedPubKey + " OP_EQUALVERIFY OP_CHECKSIG OP_ELSE 2 " + alicePubKey + " " + bobPubKey + " " + pubKey3 + " 3 OP_CHECKMULTISIG OP_ENDIF OP_CHECKFINALRESULT";
+        String scriptXHash = SHA256.encryptGetEncode(scriptX);
         String lockingScript = "OP_DUP OP_HASH " + scriptXHash + " OP_EQUALVERIFY";
         Operator operator = new Operator(lockingScript, unlockingScript, message);
         boolean result = operator.validate();
@@ -287,6 +289,7 @@ class OperatorTest {
         System.out.println("scriptXHash = " + scriptXHash);
         System.out.println("unlockingScript = " + unlockingScript);
         System.out.println("lockingScript = " + lockingScript);
+        System.out.println(lockingScript + ", " + unlockingScript);
         System.out.println("========넣어줘야 하는 값 끝========");
 
 
@@ -327,8 +330,10 @@ class OperatorTest {
 
 
         // then
-        String unlockingScript = aliceSig + " " + bobSig + " 0 OP_IF OP_DUP OP_HASH " + aliceHashedPubKey + " OP_EQUALVERIFY OP_CHECKSIG OP_ELSE 2 " + alicePubKey + " " + bobPubKey + " " + pubKey3 + " 3 OP_CHECKMULTISIG OP_ENDIF OP_CHECKFINALRESULT";
-        String scriptXHash = SHA256.encryptGetEncode(unlockingScript);
+//        String unlockingScript = aliceSig + " " + bobSig + " 0 OP_IF OP_DUP OP_HASH " + aliceHashedPubKey + " OP_EQUALVERIFY OP_CHECKSIG OP_ELSE 2 " + alicePubKey + " " + bobPubKey + " " + pubKey3 + " 3 OP_CHECKMULTISIG OP_ENDIF OP_CHECKFINALRESULT";
+        String scriptX = "OP_IF OP_DUP OP_HASH " + aliceHashedPubKey + " OP_EQUALVERIFY OP_CHECKSIG OP_ELSE 2 " + alicePubKey + " " + bobPubKey + " " + pubKey3 + " 3 OP_CHECKMULTISIG OP_ENDIF OP_CHECKFINALRESULT";
+        String unlockingScript = aliceSig + " " + bobSig + " 0 " + scriptX;
+        String scriptXHash = SHA256.encryptGetEncode(scriptX);
         String lockingScript = "OP_DUP OP_HASH " + scriptXHash + " OP_EQUALVERIFY";
 
 
@@ -342,6 +347,7 @@ class OperatorTest {
         System.out.println("scriptXHash = " + scriptXHash);
         System.out.println("unlockingScript = " + unlockingScript);
         System.out.println("lockingScript = " + lockingScript);
+        System.out.println(lockingScript + ", " + unlockingScript);
         System.out.println("========넣어줘야 하는 값 끝========");
 
         Operator operator = new Operator(lockingScript, unlockingScript, message);

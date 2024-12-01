@@ -68,20 +68,30 @@ OP_IF OP_DUP OP_HASH <public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_ELSE 2 <Ali
 ====================================================================================================
 P2SH (alice만 검증하는 경우)
 tx:
-input: tx3, 0, 100, OP_DUP OP_HASH <script X hash> OP_EQUALVERIFY, <script X>
+input: tx3, 0, 100, OP_DUP OP_HASH <script X hash> OP_EQUALVERIFY, <Alice signature> <AlicePubKey> 1 <script X>
 output, 0: 50, OP_DUP OP_HASH <seller's public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_CHECKFINALRESULT
 output, 1: 40, OP_DUP OP_HASH <buyer's public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_CHECKFINALRESULT
 
-script X = <Alice signature> <Alice public key> 1 OP_IF OP_DUP OP_HASH <public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_ELSE 2 <Alice pubKey> <Bob pubKey> <pubKey3> 3 OP_CHECKMULTISIG OP_ENDIF OP_CHECKFINALRESULT
+구매할때 제시하는 부분
+<Alice signature> <Alice public key> 1
+scriptX
+OP_IF OP_DUP OP_HASH <public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_ELSE 2 <Alice pubKey> <Bob pubKey> <pubKey3> 3 OP_CHECKMULTISIG OP_ENDIF OP_CHECKFINALRESULT
+
+unlocking script
+<Alice signature> <Alice public key> 1 OP_IF OP_DUP OP_HASH <public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_ELSE 2 <Alice pubKey> <Bob pubKey> <pubKey3> 3 OP_CHECKMULTISIG OP_ENDIF OP_CHECKFINALRESULT
 ====================================================================================================
 
 ====================================================================================================
-P2SH (alice, bob 둘다 검증하는 경우)
+P2SH (multisig 경우)
 tx:
-input: tx3, 0, 100, OP_DUP OP_HASH <script X hash> OP_EQUALVERIFY, <script X>
+input: tx3, 0, 100, OP_DUP OP_HASH <script X hash> OP_EQUALVERIFY, <Alice signature> <Bob signature> 0 <script X>
 output, 0: 50, OP_DUP OP_HASH <seller's public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_CHECKFINALRESULT
 output, 1: 10, OP_DUP OP_HASH <Alice public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_CHECKFINALRESULT
 output, 2: 30, OP_DUP OP_HASH <Bob public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_CHECKFINALRESULT
 
-script X = <Alice signature> <Bob signature> 0 OP_IF OP_DUP OP_HASH <public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_ELSE 2 <Alice pubKey> <Bob pubKey> <pubKey3> 3 OP_CHECKMULTISIG OP_ENDIF OP_CHECKFINALRESULT
+<Alice signature> <Bob signature> 0
+OP_IF OP_DUP OP_HASH <public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_ELSE 2 <Alice pubKey> <Bob pubKey> <pubKey3> 3 OP_CHECKMULTISIG OP_ENDIF OP_CHECKFINALRESULT
+
+unlocking script
+<Alice signature> <Bob signature> 0 OP_IF OP_DUP OP_HASH <public key hash> OP_EQUALVERIFY OP_CHECKSIG OP_ELSE 2 <Alice pubKey> <Bob pubKey> <pubKey3> 3 OP_CHECKMULTISIG OP_ENDIF OP_CHECKFINALRESULT
 ====================================================================================================

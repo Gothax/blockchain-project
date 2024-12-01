@@ -1,5 +1,6 @@
 package com.gothaxcity.util;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -56,6 +57,8 @@ class ECDSATest {
         boolean result = ECDSA.verifySigWithPubKey(message, wrongEncodedSig, publicKeyBase64);
 
         // then
-        assertFalse(result);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            assertFalse(result);
+        });
     }
 }
